@@ -1,0 +1,65 @@
+---
+title: "Volcanic eruption"
+author: "Annrose"
+format: html
+editor: visual
+---
+
+## Quarto
+
+Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+
+## Running Code
+
+When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
+
+```{r}
+1 + 1
+```
+
+You can add options to executable code like this
+
+```{r}
+#| echo: false
+2 * 2
+```
+
+The `echo: false` option disables the printing of code (only output is displayed).
+
+------------------------------------------------------------------------
+
+# Task  
+
+Create 1-2 multipanel figure(s) that demonstrate your mastery of data handling and visualization in R.
+
+Your figures should showcase:
+
+1.  Data wrangling using tidyr and dplyr
+2.  Advanced ggplot2 visualization
+3.  Spatial data handling and mapping (create a map in R or QGIS)
+4.   Integration of various plot types into cohesive multipanel figure(s)
+
+------------------------------------------------------------------------
+
+# Data source and context 
+
+This data come was downloaded from Jonthegreek github account <https://github.com/rfordatascience/tidytuesday/tree/8901222a0d0fcac636122e42d7fa0293148cec01/data/2020/2020-05-12> data/2020/2020-05-12 . However he is not the main source and in his quote.
+
+"The data comes from [The Smithsonian Institution](https://volcano.si.edu/). He also states [Axios](https://www.axios.com/chart-every-volcano-that-erupted-since-krakatoa-467da621-41ba-4efc-99c6-34ff3cb27709.html) put together a lovely plot of volcano eruptions since Krakatoa (after 1883) by elevation and type.
+
+------------------------------------------------------------------------
+
+# Key variables
+
+The
+
+Key variables • What your think of the data quality
+
+------------------------------------------------------------------------
+
+# Data transformations
+
+• Show your use of tidyr and dplyr, for example: – Group_by() + summarize() operations – pivot_longer() or pivot_wider() operation
+
+```{*{r}
+```
