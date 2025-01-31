@@ -161,19 +161,19 @@ head(erup_date)
     # Example: Convert year, month, and day from Date to integers
     erup_final <- erup_final %>%
       mutate(
-        start_year_int = as.integer(year(start_date)),  # Extract and convert year to integer
-        start_month_int = as.integer(month(start_date)), # Extract and convert month to integer
-        start_day_int = as.integer(day(start_date)),     # Extract and convert day to integer
+        start_year_int = as.integer(year(start_date)),  #  year to integer
+        start_month_int = as.integer(month(start_date)), #  month to integer
+        start_day_int = as.integer(day(start_date)),     # date to integer
         
-        end_year_int = as.integer(year(end_date)),       # Extract and convert year to integer
-        end_month_int = as.integer(month(end_date)),     # Extract and convert month to integer
-        end_day_int = as.integer(day(end_date))          # Extract and convert day to integer
+        end_year_int = as.integer(year(end_date)),       # year to integer
+        end_month_int = as.integer(month(end_date)),     # month to integer
+        end_day_int = as.integer(day(end_date))          # date to integer
       )
 
-    # Check the structure of the resulting dataframe
+    # structure of the resulting dataframe
     str(erup_final)
 
-    # View the first few rows to verify the conversion
+    # first few rows to verify the conversion
     head(erup_final)
 
     ```
@@ -217,7 +217,9 @@ erup_final2 <- erup_final %>%
 
 #  structure after conversion
 str(erup_final2)
+```
 
+```{r}
 # The first few rows to verify the conversion
 head(erup_final2)
 
@@ -282,7 +284,7 @@ ecfv <- ggplot(erup_group, aes(x = eruption_category, y = frequency, color = evi
        color = "Dating Method") +
   theme_minimal() +
   theme(
-    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),  # Title font size and alignment
+    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),  
     axis.title.x = element_text(size = 5),  
     axis.title.y = element_text(size = 6),  
     axis.text.x = element_text(size = 6),   
@@ -364,9 +366,8 @@ print(vn10)
 
 # Spatial data
 
-In this section i will still use volcanic eruption data
-I will start by selecting variables again
-With my current selection i will add coordinated (log and latitude)
+In this section i will still use volcanic eruption data I will start by selecting variables again With my current selection i will add coordinated (log and latitude)
+
 ```{r}
 #group_by volcano_name, evidence_method_dating, eruption_category,longitude,latitude
 erup_spatial <- erup_final2 %>%
@@ -375,7 +376,6 @@ erup_spatial <- erup_final2 %>%
     frequency = n(),  # Count occurrences of each eruption_category
     .groups = "drop")  # I used this function to ungroup after summarizing to avoid frequency being run with valcanic names
 ```
-
 
 ```{r}
 # load spatial libraries
@@ -389,9 +389,11 @@ library(raster)
 library(leaflet)
 library(mapview)
 ```
+
 # converting data as spatial object using sf
+
 ```{r}
-# Convert the data to a spatial object (sf object). What this means is that am allocating geometry to each coordinate as point vector
+# Convertion of the data to a spatial object (sf object). What this means is that am allocating geometry to each coordinate as point vector
 erup_spatial_sf <- erup_spatial %>%
   st_as_sf(coords = c("longitude", "latitude"), crs = 4326)  # 4326 is WGS 84 world standard 
 ```
@@ -401,7 +403,7 @@ erup_spatial_sf <- erup_spatial %>%
 library(ggplot2)
 library(ggspatial)
 
-# Plot the volcano locations on a map
+# Plotting the volcano locations on a map
 vn_map <- ggplot() +
   geom_sf(data = erup_spatial_sf, aes(color = eruption_category, size = frequency), alpha = 0.7) +
   scale_color_viridis_d() +  # Choose a color palette for the eruption category
@@ -424,12 +426,13 @@ vn_map <- ggplot() +
 print(vn_map)
 
 ```
+
 ```{r}
 # # Same map as above but now with a base map
 # install.packages("rnaturalearthdata")
 world <- ne_countries(scale = "medium", returnclass = "sf")
 
-# Plot volcanoes with a world map base layer
+# Plotting volcanoes with a world map base layer
 vn_map_with_base <- ggplot() +
   geom_sf(data = world, fill = "gray90", color = "white") +  # Base world map layer
   geom_sf(data = erup_spatial_sf, aes(color = eruption_category, size = frequency), alpha = 0.7) +
@@ -450,6 +453,8 @@ print(vn_map_with_base)
 
 ```
 
+# Mapping with leaflet
+
 ```{r}
 #Interactive map with leaflet
 leaflet(erup_spatial_sf) %>%
@@ -465,10 +470,10 @@ leaflet(erup_spatial_sf) %>%
 
 ```
 
-```{r}
-# map with leaflet
+# Color palette for eruption categories (color Factor())
 
-# Color palette for eruption categories
+```{r}
+
 category_colors <- colorFactor(palette = "Set3", domain = erup_spatial_sf$eruption_category)
 
 leaflet(erup_spatial_sf) %>%
@@ -489,28 +494,25 @@ leaflet(erup_spatial_sf) %>%
 
 ```
 
+# Custom colors for the categories
 
 ```{r}
-#Custom colors for the categories
-# Define custom colors with alpha transparency on red
-#
 category_colors <- colorFactor(
   palette = c("#FF000080", "yellow", "black"),  # Red with 50% opacity (alpha = 128 in hex)
   domain = erup_spatial_sf$eruption_category
 )
 
-# Create the leaflet map
 leaflet(erup_spatial_sf) %>%
   addTiles() %>%
   addCircleMarkers(
-    color = ~category_colors(eruption_category),  # Apply custom colors based on eruption category
+    color = ~category_colors(eruption_category),  # custom colors based on eruption category
     radius = ~frequency / 5,  # Scale size based on frequency
     popup = ~paste("Volcano: ", volcano_name, "<br>Frequency: ", frequency),
-    stroke = FALSE, fillOpacity = 0.5  # Adjust fillOpacity for visibility
+    stroke = FALSE, fillOpacity = 0.5  # fillOpacity for visibility
   ) %>%
   addLegend(
     position = "bottomright",
-    pal = category_colors,  # Use the defined color palette
+    pal = category_colors,  # defined color palette
     values = erup_spatial_sf$eruption_category, 
     title = "Eruption Category"
   )
@@ -518,24 +520,21 @@ leaflet(erup_spatial_sf) %>%
 
 ```
 
+------------------------------------------------------------------------
+
+# Visualization using Color palette color palette for eruption categories
+
 ```{r}
-library(leaflet)
-
-# Define color palette for eruption categories
-library(leaflet)
-
-# Define color palette for eruption categories
+#color palette
 category_colors <- colorFactor(
   palette = c("#FF000080", "yellow", "black"),  
   domain = erup_spatial_sf$eruption_category
 )
-
-# Define frequency breakpoints for legend
+# Frequency breakpoints for legend
 freq_values <- c(50, 100, 200)  # Adjust based on data
 freq_sizes <- freq_values / 0.5   # Match circle radius scaling
 freq_labels <- paste(freq_values, "events")
-
-# Create the leaflet map
+#plotting in leaflet
 leaflet(erup_spatial_sf) %>%
   addTiles() %>%
   addCircleMarkers(
@@ -549,10 +548,8 @@ leaflet(erup_spatial_sf) %>%
     pal = category_colors,
     values = erup_spatial_sf$eruption_category, 
     title = "Eruption Category"
-  ) %>%
-  addControl(freq_legend_html, position = "bottomleft")
-
-
-
+  ) 
 ```
+------------------------------------------------------------------------
+
 
