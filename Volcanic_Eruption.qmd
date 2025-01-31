@@ -3,6 +3,8 @@ title: "Volcanic eruption"
 author: "Annrose Mwangi"
 format: html
 editor: visual
+editor_options: 
+  chunk_output_type: inline
 ---
 
 ## Quarto
@@ -14,17 +16,8 @@ Quarto enables you to weave together content and executable code into a finished
 When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
 
 ```{r}
-1 + 1
+knitr::opts_chunk$set(echo = TRUE, fig.show = "hold")
 ```
-
-You can add options to executable code like this
-
-```{r}
-#| echo: false
-2 * 2
-```
-
-The `echo: false` option disables the printing of code (only output is displayed).
 
 ------------------------------------------------------------------------
 
@@ -57,12 +50,22 @@ This data is about the start and the end year,date and month for eruptions, cate
 
 # Data wrangling using tidyr and dplyr
 
-Loaded data from my github repository
+Loaded all libraries Loaded data from my github repository
 
 ```{r}
+#libraries
 library(tidyr)
 library(dplyr)
+library(quarto)
+library(lubridate)
+library(ggplot2)
+library(palmerpenguins)
+library(patchwork) # plot alignment
+library(plotly) 
+library(ggiraph)
+```
 
+```{r}
 # At first i used this code to read csv from git hub but gave me this error
 
 # I changed it to this code i replaced github.com to raw.githubusercontent.com
@@ -71,8 +74,6 @@ eruption1 <- read.csv("https://raw.githubusercontent.com/annrose98/Eruption/main
 eruption1<- as_tibble(eruption1) 
 # STructure to understand the data
 str(eruption1)
-
-
 ```
 
 ```{r}
@@ -107,11 +108,7 @@ str(erup_date)
 
 # The first few rows to verify dates
 head(erup_date)
-
-
 ```
-
-1.  
 
 # 1.Unite ()
 
@@ -123,15 +120,6 @@ head(erup_date)
         unite(start_year, start_month, start_day, sep = "_") %>%
         unite(end_year, end_month, end_day, sep = "_")
     str(erup_unite)
-
-
-    ```
-
-    ```{}
-    ```
-
-    ```         
-
     ```
 
     # 2. Separate()
@@ -141,12 +129,10 @@ head(erup_date)
     When separating the dates i encountered an error of format. I realized i have to introduce fill=right, reason some values were missing in the day section. this made the format to be an uniform. fill="right" ensures to fill NA for the missing values
 
     ```{r}
-
     library(dplyr)
     library(tidyr)
-    library(lubridate)
 
-    # Mutate to convert dates to character as it had NA values
+    # used mutate function to convert date to character as it had NA values
     erup_separate <- erup_unite %>%
       mutate(
         start_date = as.character(start_date),  
@@ -155,84 +141,418 @@ head(erup_date)
       separate(start_date, into = c("start_year", "start_month", "start_day"), sep = "-", fill = "right") %>%
       separate(end_date, into = c("end_year", "end_month", "end_day"), sep = "-", fill = "right")
 
-    # Recombine the components into full Date format
-    erup_final <- erup_separate %>%
+    # Recombine the components into Date format
+    # here i was just playing around with date format just to understand how NA values works in the date section
+
+    erup_final <- erup_separate%>%
       mutate(
-        start_date = as.Date(paste(start_year, "01", "01", sep = "-"), format = "%Y-%m-%d"),  # Convert year to Date (assuming 01-01)
-        end_date = as.Date(paste(end_year, "01", "01", sep = "-"), format = "%Y-%m-%d")        # Convert year to Date (assuming 01-01)
+        start_date = as.Date(start_year, format = "%Y"),
+        end_date = as.Date(end_year, format = "%Y")       
       )
 
-    # Now that we have proper Date objects, we can extract year, month, and day
-    erup_final2 <- erup_final %>%
-      mutate(
-        start_year_int = as.integer(year(start_date)),  # Extract year as integer
-        start_month_int = as.integer(month(start_date)), # Extract month as integer
-        start_day_int = as.integer(day(start_date)),     # Extract day as integer
-        
-        end_year_int = as.integer(year(end_date)),       # Extract year as integer
-        end_month_int = as.integer(month(end_date)),     # Extract month as integer
-        end_day_int = as.integer(day(end_date))          # Extract day as integer
-      )
-
-    # Check the structure after conversion
-    str(erup_final2)
+    # he structure after conversion
+    str(erup_final)
 
     # View the first few rows to verify the conversion
-    head(erup_final2)
-
+    head(erup_final)
     ```
 
     ```{r}
+    # Example: Convert year, month, and day from Date to integers
+    erup_final <- erup_final %>%
+      mutate(
+        start_year_int = as.integer(year(start_date)),  # Extract and convert year to integer
+        start_month_int = as.integer(month(start_date)), # Extract and convert month to integer
+        start_day_int = as.integer(day(start_date)),     # Extract and convert day to integer
+        
+        end_year_int = as.integer(year(end_date)),       # Extract and convert year to integer
+        end_month_int = as.integer(month(end_date)),     # Extract and convert month to integer
+        end_day_int = as.integer(day(end_date))          # Extract and convert day to integer
+      )
+
+    # Check the structure of the resulting dataframe
+    str(erup_final)
+
+    # View the first few rows to verify the conversion
+    head(erup_final)
 
     ```
 
-    ```{}
-    ```
+I also used lubridate library to convert years,month date to interger
 
-    ```{r}
-    library(dplyr)
-    library(tidyr)
+```{r}
+library(lubridate)# for date mutation
 
-    erup_separate <- erup_unite %>%
-        separate(start_year, into = c("start_year", "start_month", "start_day"), sep = "_", fill = "right") %>%
-        separate(end_year, into = c("end_year", "end_month", "end_day"), sep = "_", fill = "right")
+# Mutate to convert dates to character as it had NA values
+erup_separate <- erup_unite %>%
+  mutate(
+    start_date = as.character(start_date),  
+    end_date = as.character(end_date)       
+  ) %>%
+  separate(start_date, into = c("start_year", "start_month", "start_day"), sep = "-", fill = "right") %>%
+  separate(end_date, into = c("end_year", "end_month", "end_day"), sep = "-", fill = "right")
 
-    # Structure
-    str(erup_separate)
+# Recombine the components into full Date format
+# Here i was just trying different codes to get better understanding of NA in date data.
+# here i used an assumtion all my date rows are in the same format
+erup_final <- erup_separate %>%
+  mutate(
+    start_date = as.Date(paste(start_year, "01", "01", sep = "-"), format = "%Y-%m-%d"),  
+    end_date = as.Date(paste(end_year, "01", "01", sep = "-"), format = "%Y-%m-%d")       
+  )
+```
 
-    ```
+```{r}
+# I then extracted year, month, and date as intergers using mutate function
+erup_final2 <- erup_final %>%
+  mutate(
+    start_year_int = as.integer(year(start_date)),  
+    start_month_int = as.integer(month(start_date)), 
+    start_day_int = as.integer(day(start_date)),     
+    
+    end_year_int = as.integer(year(end_date)),       
+    end_month_int = as.integer(month(end_date)),     
+    end_day_int = as.integer(day(end_date)) 
+  )
 
-    ```{r}
-    library(dplyr)
-    library(tidyr)
+#  structure after conversion
+str(erup_final2)
 
-    erup_separate <- erup_unite %>%
-        separate(start_year, into = c("start_year", "start_month", "start_day"), sep = "_", fill = "right") %>%
-        separate(end_year, into = c("end_year", "end_month", "end_day"), sep = "_", fill = "right")
+# The first few rows to verify the conversion
+head(erup_final2)
 
-    # Structure
-    str(erup_separate)
-
-    ```
-
-In this section i will transform the data.
+```
 
 I will use select () function to select; end and start year, eruption category ,evidence method dating and volcanic name.
 
 At these level i realised something is wrong with my dates they got distorted. I had to work backwards to sort it out to maintain the original format.
 
 ```{r}
-erup_select<- erup_separate %>% select(volcano_name,eruption_category,evidence_method_dating,start_year,end_year)
+erup_select<- erup_final2 %>% select(volcano_name,eruption_category,evidence_method_dating,start_year,end_year)
 ```
 
 ```{r}
-gap_long <- gap_wide %>%
-  pivot_longer(
-    cols = c(-continent, -country),
-    names_to = "obstype_year", values_to = "obs_values"
+# I tried to run pivote wide but realised an error of duplicate
+# To understand what these duplicates are i used function summarise and filter. I found out it is not duplicate rather it's frequency of occurence.
+erup_select %>%
+  dplyr::summarise(n = dplyr::n(), .by = c(volcano_name, evidence_method_dating, eruption_category)) %>%
+  dplyr::filter(n > 1)
+
+```
+
+------------------------------------------------------------------------
+
+# 3.Group_by (), Summarise (), frequency
+
+This motivated me to run group by function to summarise frequency of eruption category
+
+```{r}
+erup_group <- erup_select %>%
+  group_by(volcano_name, evidence_method_dating, eruption_category) %>%
+  summarise(
+    frequency = n(),  # Count occurrences of each eruption_category
+    .groups = "drop"  # I used this function to ungroup after summarizing to avoid frequency being run with valcanic names
   )
 
-tail(gap_long)
-
-head(gap_long)
 ```
+
+------------------------------------------------------------------------
+
+# Data visualization using Advanced ggplot2
+
+```{r}
+# additional libraries for advanced ggplot2
+library(ggplot2)
+library(palmerpenguins)
+library(patchwork) # plot alignment
+library(plotly) 
+library(ggiraph)
+library(ggrepel)
+```
+
+```{r}
+# plot 1: Relationship between eruption_category and frequency across volcanoes.
+
+ecfv <- ggplot(erup_group, aes(x = eruption_category, y = frequency, color = evidence_method_dating)) +
+  geom_point(size = 3, alpha = 0.7) +  # Scatter plot
+  geom_smooth(method = "loess", se = TRUE) +  # Smoothed trend line
+  labs(title = "Eruption Frequency by Category",
+       x = "Eruption Category",
+       y = "Frequency",
+       color = "Dating Method") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),  # Title font size and alignment
+    axis.title.x = element_text(size = 5),  
+    axis.title.y = element_text(size = 6),  
+    axis.text.x = element_text(size = 6),   
+    axis.text.y = element_text(size = 6)    
+  )
+
+print(ecfv)
+
+
+```
+
+# plot2;Eruption frequency trends over time.
+
+```{r}
+library(dplyr)
+
+# Summarize data to get the count of eruptions per volcano and category
+#  Here the volcano names were cluttered and overlapping and it was so hard to interprete
+erup_summary <- erup_group %>%
+  group_by(volcano_name, eruption_category, evidence_method_dating) %>%
+  summarise(frequency = n(), .groups = "drop")
+
+# Now you can use 'erup_summary' in the plot, which includes 'evidence_method_dating'
+vn <- ggplot(erup_summary, aes(x = eruption_category, y = volcano_name, color = evidence_method_dating)) +
+  geom_point(aes(size = frequency), alpha = 0.7) +  # Size of points based on frequency
+  geom_smooth(method = "loess", se = TRUE) +  # Smoothed trend line
+  labs(title = "Eruption Frequency by Category",
+       x = "Eruption Category",
+       y = "Volcanic Name",
+       color = "Dating Method") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),  # Title font size and alignment
+    axis.title.x = element_text(size = 5),  
+    axis.title.y = element_text(size = 0.5),  
+    axis.text.x = element_text(size = 6),   
+    axis.text.y = element_text(size = 0.5)
+  )
+
+print(vn)
+
+
+```
+
+```{r}
+# volcanoes with frequency greater than 22 using filter()
+# Here i decided to use filter function to make the plot make sense
+# I started by grouping by volcano name and filtering vvolcano name frequency greater than 22
+erup_summary_filtered <- erup_group %>%
+  group_by(volcano_name) %>%
+  filter(frequency >22) %>%
+  ungroup()  # Remove grouping for further operations
+
+# plotted geom_point and geom_smooth
+vn10<- ggplot(erup_summary_filtered, aes(x = eruption_category, y = volcano_name, color = evidence_method_dating)) +
+  geom_point(aes(size = frequency), alpha = 0.7) +  # Size of points based on frequency
+  geom_smooth(method = "loess", se = TRUE) +  # Smoothed trend line
+  labs(title = "Eruption Frequency by Category",
+       x = "Eruption Category",
+       y = "Volcanic Name",
+       color = "Dating Method") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),  # Title font size and alignment
+    axis.title.x = element_text(size = 5),  
+    axis.title.y = element_text(size = 6),  
+    axis.text.x = element_text(size = 6),   
+    axis.text.y = element_text(size =3)
+  )
+
+# Print the plot
+print(vn10)
+
+# Summary in this graph it describes the frequency of eruption, type of volcano and method of observation.
+# the black dots represent the frequency intensity and the colors represent dating method.
+```
+
+------------------------------------------------------------------------
+
+# Spatial data
+
+In this section i will still use volcanic eruption data
+I will start by selecting variables again
+With my current selection i will add coordinated (log and latitude)
+```{r}
+#group_by volcano_name, evidence_method_dating, eruption_category,longitude,latitude
+erup_spatial <- erup_final2 %>%
+  group_by(volcano_name, evidence_method_dating, eruption_category,longitude,latitude ) %>%
+  summarise(
+    frequency = n(),  # Count occurrences of each eruption_category
+    .groups = "drop")  # I used this function to ungroup after summarizing to avoid frequency being run with valcanic names
+```
+
+
+```{r}
+# load spatial libraries
+library(sf) # vector data
+library(rnaturalearth) # shape of swe
+library(ggplot2)
+library(ggspatial) # plot spatial in ggplot
+library(dplyr)
+library(terra)
+library(raster)
+library(leaflet)
+library(mapview)
+```
+# converting data as spatial object using sf
+```{r}
+# Convert the data to a spatial object (sf object). What this means is that am allocating geometry to each coordinate as point vector
+erup_spatial_sf <- erup_spatial %>%
+  st_as_sf(coords = c("longitude", "latitude"), crs = 4326)  # 4326 is WGS 84 world standard 
+```
+
+```{r}
+# plotting volcano locations using ggplot2 and  based on frequency and category
+library(ggplot2)
+library(ggspatial)
+
+# Plot the volcano locations on a map
+vn_map <- ggplot() +
+  geom_sf(data = erup_spatial_sf, aes(color = eruption_category, size = frequency), alpha = 0.7) +
+  scale_color_viridis_d() +  # Choose a color palette for the eruption category
+  scale_size_continuous(range = c(1, 5)) +  # Adjust the size of points based on frequency
+  labs(title = "Volcano Eruption Locations",
+       subtitle = "Based on eruption frequency and category",
+       x = "Longitude",
+       y = "Latitude",
+       color = "Eruption Category",
+       size = "Frequency") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+    plot.subtitle = element_text(size = 12, hjust = 0.5)
+  ) +
+  annotation_north_arrow(location = "bl", width = unit(1, "cm"), height = unit(1, "cm")) +
+  annotation_scale(location = "br")
+
+# Print the map
+print(vn_map)
+
+```
+```{r}
+# # Same map as above but now with a base map
+# install.packages("rnaturalearthdata")
+world <- ne_countries(scale = "medium", returnclass = "sf")
+
+# Plot volcanoes with a world map base layer
+vn_map_with_base <- ggplot() +
+  geom_sf(data = world, fill = "gray90", color = "white") +  # Base world map layer
+  geom_sf(data = erup_spatial_sf, aes(color = eruption_category, size = frequency), alpha = 0.7) +
+  scale_color_viridis_d() +
+  scale_size_continuous(range = c(1, 5)) +
+  labs(title = "Volcano Eruption Locations",
+       subtitle = "Based on eruption frequency and category",
+       x = "Longitude",
+       y = "Latitude",
+       color = "Eruption Category",
+       size = "Frequency") +
+  theme_minimal() +
+  annotation_north_arrow(location = "bl", width = unit(1, "cm"), height = unit(1, "cm")) +
+  annotation_scale(location = "br")
+
+# Print the map with base layer
+print(vn_map_with_base)
+
+```
+
+```{r}
+#Interactive map with leaflet
+leaflet(erup_spatial_sf) %>%
+  addTiles() %>%
+  addCircleMarkers(
+    color = ~factor(eruption_category), 
+    radius = ~frequency/5,  # Scale size based on frequency
+    popup = ~paste("Volcano: ", volcano_name, "<br>Frequency: ", frequency),
+    stroke = FALSE, fillOpacity = 0.7
+  ) %>%
+  addLegend(position = "bottomright", pal = colorFactor("viridis", erup_spatial_sf$eruption_category), values = erup_spatial_sf$eruption_category, title = "Eruption Category")
+
+
+```
+
+```{r}
+# map with leaflet
+
+# Color palette for eruption categories
+category_colors <- colorFactor(palette = "Set3", domain = erup_spatial_sf$eruption_category)
+
+leaflet(erup_spatial_sf) %>%
+  addTiles() %>%
+  addCircleMarkers(
+    color = ~category_colors(eruption_category),  # Apply colors based on eruption category
+    radius = ~frequency / 5,  # Scale size based on frequency
+    popup = ~paste("Volcano: ", volcano_name, "<br>Frequency: ", frequency),
+    stroke = FALSE, fillOpacity = 10
+  ) %>%
+  addLegend(
+    position = "bottomright",
+    pal = category_colors,  # Use the defined color palette
+    values = erup_spatial_sf$eruption_category, 
+    title = "Eruption Category",
+    opacity = 1
+  )
+
+```
+
+
+```{r}
+#Custom colors for the categories
+# Define custom colors with alpha transparency on red
+#
+category_colors <- colorFactor(
+  palette = c("#FF000080", "yellow", "black"),  # Red with 50% opacity (alpha = 128 in hex)
+  domain = erup_spatial_sf$eruption_category
+)
+
+# Create the leaflet map
+leaflet(erup_spatial_sf) %>%
+  addTiles() %>%
+  addCircleMarkers(
+    color = ~category_colors(eruption_category),  # Apply custom colors based on eruption category
+    radius = ~frequency / 5,  # Scale size based on frequency
+    popup = ~paste("Volcano: ", volcano_name, "<br>Frequency: ", frequency),
+    stroke = FALSE, fillOpacity = 0.5  # Adjust fillOpacity for visibility
+  ) %>%
+  addLegend(
+    position = "bottomright",
+    pal = category_colors,  # Use the defined color palette
+    values = erup_spatial_sf$eruption_category, 
+    title = "Eruption Category"
+  )
+
+
+```
+
+```{r}
+library(leaflet)
+
+# Define color palette for eruption categories
+library(leaflet)
+
+# Define color palette for eruption categories
+category_colors <- colorFactor(
+  palette = c("#FF000080", "yellow", "black"),  
+  domain = erup_spatial_sf$eruption_category
+)
+
+# Define frequency breakpoints for legend
+freq_values <- c(50, 100, 200)  # Adjust based on data
+freq_sizes <- freq_values / 0.5   # Match circle radius scaling
+freq_labels <- paste(freq_values, "events")
+
+# Create the leaflet map
+leaflet(erup_spatial_sf) %>%
+  addTiles() %>%
+  addCircleMarkers(
+    color = ~category_colors(eruption_category),  
+    radius = ~frequency /7,  # Scale size based on frequency
+    popup = ~paste("Volcano: ", volcano_name, "<br>Frequency: ", frequency),
+    stroke = FALSE, fillOpacity = 7  
+  ) %>%
+  addLegend(
+    position = "bottomright",
+    pal = category_colors,
+    values = erup_spatial_sf$eruption_category, 
+    title = "Eruption Category"
+  ) %>%
+  addControl(freq_legend_html, position = "bottomleft")
+
+
+
+```
+
