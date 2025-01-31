@@ -550,6 +550,13 @@ leaflet(erup_spatial_sf) %>%
     title = "Eruption Category"
   ) 
 ```
+
 ------------------------------------------------------------------------
 
+# Challenges  
 
+I struggled with git and git hub committing my work. it made me learn other ways of doing it through R terminal.
+
+# lesson learned 
+
+Connecting git and git hub
