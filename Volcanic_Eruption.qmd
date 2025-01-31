@@ -1,6 +1,6 @@
 ---
 title: "Volcanic eruption"
-author: "Annrose"
+author: "Annrose Mwangi"
 format: html
 editor: visual
 ---
@@ -28,7 +28,7 @@ The `echo: false` option disables the printing of code (only output is displayed
 
 ------------------------------------------------------------------------
 
-# Task  
+# Task
 
 Create 1-2 multipanel figure(s) that demonstrate your mastery of data handling and visualization in R.
 
@@ -37,11 +37,11 @@ Your figures should showcase:
 1.  Data wrangling using tidyr and dplyr
 2.  Advanced ggplot2 visualization
 3.  Spatial data handling and mapping (create a map in R or QGIS)
-4.   Integration of various plot types into cohesive multipanel figure(s)
+4.  Integration of various plot types into cohesive multipanel figure(s)
 
 ------------------------------------------------------------------------
 
-# Data source and context 
+# Data source and context
 
 This data come was downloaded from Jonthegreek github account <https://github.com/rfordatascience/tidytuesday/tree/8901222a0d0fcac636122e42d7fa0293148cec01/data/2020/2020-05-12> data/2020/2020-05-12 . However he is not the main source and in his quote.
 
@@ -51,15 +51,188 @@ This data come was downloaded from Jonthegreek github account <https://github.co
 
 # Key variables
 
-The
-
-Key variables • What your think of the data quality
+This data is about the start and the end year,date and month for eruptions, category of eruption, evidence method dating, ID of eruption and coordinated of the location of erruptions.
 
 ------------------------------------------------------------------------
 
-# Data transformations
+# Data wrangling using tidyr and dplyr
 
-• Show your use of tidyr and dplyr, for example: – Group_by() + summarize() operations – pivot_longer() or pivot_wider() operation
+Loaded data from my github repository
 
-```{*{r}
+```{r}
+library(tidyr)
+library(dplyr)
+
+# At first i used this code to read csv from git hub but gave me this error
+
+# I changed it to this code i replaced github.com to raw.githubusercontent.com
+
+eruption1 <- read.csv("https://raw.githubusercontent.com/annrose98/Eruption/main/eruptions.csv")
+eruption1<- as_tibble(eruption1) 
+# STructure to understand the data
+str(eruption1)
+
+
+```
+
+```{r}
+head(eruption1)
+colnames(eruption1)
+```
+
+# Quality of data
+
+In terms of volcanic eruption date in terms of columns it is quite ok but in terms data frame, the date section is defined as character and not an integer.
+
+Date formatting
+
+```{r}
+
+library(dplyr)
+
+erup_date <- eruption1 %>%
+  mutate(
+    start_date = as.Date(paste0(as.character(start_year), "-", 
+                                sprintf("%02d", as.integer(start_month)), "-", 
+                                sprintf("%02d", as.integer(start_day))), 
+                         format = "%Y-%m-%d"),
+    end_date = as.Date(paste0(as.character(end_year), "-", 
+                              sprintf("%02d", as.integer(end_month)), "-", 
+                              sprintf("%02d", as.integer(end_day))), 
+                       format = "%Y-%m-%d")
+  )
+
+# structure after conversion
+str(erup_date)
+
+# The first few rows to verify dates
+head(erup_date)
+
+
+```
+
+1.  
+
+# 1.Unite ()
+
+1.  will start by uniting the dates( start date, year, month and end date, month and year) Which it also makes the data longer
+
+    ```{r}
+    #initial one
+    erup_unite <- erup_date%>%
+        unite(start_year, start_month, start_day, sep = "_") %>%
+        unite(end_year, end_month, end_day, sep = "_")
+    str(erup_unite)
+
+
+    ```
+
+    ```{}
+    ```
+
+    ```         
+
+    ```
+
+    # 2. Separate()
+
+    The second chunk am going to separate again (Separate year,month and date for both end and start) it makes the data wider.
+
+    When separating the dates i encountered an error of format. I realized i have to introduce fill=right, reason some values were missing in the day section. this made the format to be an uniform. fill="right" ensures to fill NA for the missing values
+
+    ```{r}
+
+    library(dplyr)
+    library(tidyr)
+    library(lubridate)
+
+    # Mutate to convert dates to character as it had NA values
+    erup_separate <- erup_unite %>%
+      mutate(
+        start_date = as.character(start_date),  
+        end_date = as.character(end_date)       
+      ) %>%
+      separate(start_date, into = c("start_year", "start_month", "start_day"), sep = "-", fill = "right") %>%
+      separate(end_date, into = c("end_year", "end_month", "end_day"), sep = "-", fill = "right")
+
+    # Recombine the components into full Date format
+    erup_final <- erup_separate %>%
+      mutate(
+        start_date = as.Date(paste(start_year, "01", "01", sep = "-"), format = "%Y-%m-%d"),  # Convert year to Date (assuming 01-01)
+        end_date = as.Date(paste(end_year, "01", "01", sep = "-"), format = "%Y-%m-%d")        # Convert year to Date (assuming 01-01)
+      )
+
+    # Now that we have proper Date objects, we can extract year, month, and day
+    erup_final2 <- erup_final %>%
+      mutate(
+        start_year_int = as.integer(year(start_date)),  # Extract year as integer
+        start_month_int = as.integer(month(start_date)), # Extract month as integer
+        start_day_int = as.integer(day(start_date)),     # Extract day as integer
+        
+        end_year_int = as.integer(year(end_date)),       # Extract year as integer
+        end_month_int = as.integer(month(end_date)),     # Extract month as integer
+        end_day_int = as.integer(day(end_date))          # Extract day as integer
+      )
+
+    # Check the structure after conversion
+    str(erup_final2)
+
+    # View the first few rows to verify the conversion
+    head(erup_final2)
+
+    ```
+
+    ```{r}
+
+    ```
+
+    ```{}
+    ```
+
+    ```{r}
+    library(dplyr)
+    library(tidyr)
+
+    erup_separate <- erup_unite %>%
+        separate(start_year, into = c("start_year", "start_month", "start_day"), sep = "_", fill = "right") %>%
+        separate(end_year, into = c("end_year", "end_month", "end_day"), sep = "_", fill = "right")
+
+    # Structure
+    str(erup_separate)
+
+    ```
+
+    ```{r}
+    library(dplyr)
+    library(tidyr)
+
+    erup_separate <- erup_unite %>%
+        separate(start_year, into = c("start_year", "start_month", "start_day"), sep = "_", fill = "right") %>%
+        separate(end_year, into = c("end_year", "end_month", "end_day"), sep = "_", fill = "right")
+
+    # Structure
+    str(erup_separate)
+
+    ```
+
+In this section i will transform the data.
+
+I will use select () function to select; end and start year, eruption category ,evidence method dating and volcanic name.
+
+At these level i realised something is wrong with my dates they got distorted. I had to work backwards to sort it out to maintain the original format.
+
+```{r}
+erup_select<- erup_separate %>% select(volcano_name,eruption_category,evidence_method_dating,start_year,end_year)
+```
+
+```{r}
+gap_long <- gap_wide %>%
+  pivot_longer(
+    cols = c(-continent, -country),
+    names_to = "obstype_year", values_to = "obs_values"
+  )
+
+tail(gap_long)
+
+head(gap_long)
 ```

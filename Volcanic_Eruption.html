@@ -6,7 +6,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="Annrose">
+<meta name="author" content="Annrose Mwangi">
 
 <title>Volcanic eruption</title>
 <style>
@@ -90,7 +90,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Author</div>
     <div class="quarto-title-meta-contents">
-             <p>Annrose </p>
+             <p>Annrose Mwangi </p>
           </div>
   </div>
     
@@ -111,18 +111,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="running-code">Running Code</h2>
 <p>When you click the <strong>Render</strong> button a document will be generated that includes both content and the output of embedded code. You can embed code like this:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span> <span class="sc">+</span> <span class="dv">1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 2</code></pre>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span>opts_chunk<span class="sc">$</span><span class="fu">set</span>(<span class="at">echo =</span> <span class="cn">TRUE</span>, <span class="at">fig.show =</span> <span class="st">"hold"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</div>
-<p>You can add options to executable code like this</p>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 4</code></pre>
-</div>
-</div>
-<p>The <code>echo: false</code> option disables the printing of code (only output is displayed).</p>
 <hr>
 </section>
 <section id="task" class="level1">
@@ -145,14 +135,508 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="key-variables" class="level1">
 <h1>Key variables</h1>
-<p>The</p>
-<p>Key variables • What your think of the data quality</p>
+<p>This data is about the start and the end year,date and month for eruptions, category of eruption, evidence method dating, ID of eruption and coordinated of the location of erruptions.</p>
 <hr>
 </section>
-<section id="data-transformations" class="level1">
-<h1>Data transformations</h1>
-<p>• Show your use of tidyr and dplyr, for example: – Group_by() + summarize() operations – pivot_longer() or pivot_wider() operation</p>
-<pre class="{*{r}"><code></code></pre>
+<section id="data-wrangling-using-tidyr-and-dplyr" class="level1">
+<h1>Data wrangling using tidyr and dplyr</h1>
+<p>Loaded all libraries Loaded data from my github repository</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">#libraries</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyr)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'dplyr'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following objects are masked from 'package:stats':
+
+    filter, lag</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(quarto)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'quarto' was built under R version 4.4.2</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lubridate)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'lubridate'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following objects are masked from 'package:base':
+
+    date, intersect, setdiff, union</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(palmerpenguins)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(patchwork) <span class="co"># plot alignment</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(plotly) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'plotly' was built under R version 4.4.2</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'plotly'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following object is masked from 'package:ggplot2':
+
+    last_plot</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following object is masked from 'package:stats':
+
+    filter</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following object is masked from 'package:graphics':
+
+    layout</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggiraph)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'ggiraph' was built under R version 4.4.2</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># At first i used this code to read csv from git hub but gave me this error</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="co"># I changed it to this code i replaced github.com to raw.githubusercontent.com</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>eruption1 <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"https://raw.githubusercontent.com/annrose98/Eruption/main/eruptions.csv"</span>)</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>eruption1<span class="ot">&lt;-</span> <span class="fu">as_tibble</span>(eruption1) </span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="co"># STructure to understand the data</span></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(eruption1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>tibble [11,178 × 15] (S3: tbl_df/tbl/data.frame)
+ $ volcano_number        : int [1:11178] 266030 343100 233020 345020 353010 273070 282050 241040 311060 284096 ...
+ $ volcano_name          : chr [1:11178] "Soputan" "San Miguel" "Fournaise, Piton de la" "Rincon de la Vieja" ...
+ $ eruption_number       : int [1:11178] 22354 22355 22343 22346 22347 22344 22345 22338 22341 22340 ...
+ $ eruption_category     : chr [1:11178] "Confirmed Eruption" "Confirmed Eruption" "Confirmed Eruption" "Confirmed Eruption" ...
+ $ area_of_activity      : chr [1:11178] NA NA NA NA ...
+ $ vei                   : int [1:11178] NA NA NA NA NA NA NA 2 NA 1 ...
+ $ start_year            : int [1:11178] 2020 2020 2020 2020 2020 2020 2020 2019 2019 2019 ...
+ $ start_month           : int [1:11178] 3 2 2 1 1 1 1 12 12 12 ...
+ $ start_day             : int [1:11178] 23 22 10 31 12 12 11 9 7 5 ...
+ $ evidence_method_dating: chr [1:11178] "Historical Observations" "Historical Observations" "Historical Observations" "Historical Observations" ...
+ $ end_year              : int [1:11178] 2020 2020 2020 2020 2020 2020 2020 2019 2020 2020 ...
+ $ end_month             : int [1:11178] 4 2 4 4 1 1 4 12 3 4 ...
+ $ end_day               : int [1:11178] 2 22 6 17 12 22 17 9 15 17 ...
+ $ latitude              : num [1:11178] 1.11 13.43 -21.24 10.83 -0.37 ...
+ $ longitude             : num [1:11178] 124.7 -88.3 55.7 -85.3 -91.5 ...</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(eruption1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 15
+  volcano_number volcano_name eruption_number eruption_category area_of_activity
+           &lt;int&gt; &lt;chr&gt;                  &lt;int&gt; &lt;chr&gt;             &lt;chr&gt;           
+1         266030 Soputan                22354 Confirmed Erupti… &lt;NA&gt;            
+2         343100 San Miguel             22355 Confirmed Erupti… &lt;NA&gt;            
+3         233020 Fournaise, …           22343 Confirmed Erupti… &lt;NA&gt;            
+4         345020 Rincon de l…           22346 Confirmed Erupti… &lt;NA&gt;            
+5         353010 Fernandina             22347 Confirmed Erupti… &lt;NA&gt;            
+6         273070 Taal                   22344 Confirmed Erupti… &lt;NA&gt;            
+# ℹ 10 more variables: vei &lt;int&gt;, start_year &lt;int&gt;, start_month &lt;int&gt;,
+#   start_day &lt;int&gt;, evidence_method_dating &lt;chr&gt;, end_year &lt;int&gt;,
+#   end_month &lt;int&gt;, end_day &lt;int&gt;, latitude &lt;dbl&gt;, longitude &lt;dbl&gt;</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(eruption1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "volcano_number"         "volcano_name"           "eruption_number"       
+ [4] "eruption_category"      "area_of_activity"       "vei"                   
+ [7] "start_year"             "start_month"            "start_day"             
+[10] "evidence_method_dating" "end_year"               "end_month"             
+[13] "end_day"                "latitude"               "longitude"             </code></pre>
+</div>
+</div>
+</section>
+<section id="quality-of-data" class="level1">
+<h1>Quality of data</h1>
+<p>In terms of volcanic eruption date in terms of columns it is quite ok but in terms data frame, the date section is defined as character and not an integer.</p>
+<p>Date formatting</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>erup_date <span class="ot">&lt;-</span> eruption1 <span class="sc">%&gt;%</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">start_date =</span> <span class="fu">as.Date</span>(<span class="fu">paste0</span>(<span class="fu">as.character</span>(start_year), <span class="st">"-"</span>, </span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>                                <span class="fu">sprintf</span>(<span class="st">"%02d"</span>, <span class="fu">as.integer</span>(start_month)), <span class="st">"-"</span>, </span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>                                <span class="fu">sprintf</span>(<span class="st">"%02d"</span>, <span class="fu">as.integer</span>(start_day))), </span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>                         <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>),</span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">end_date =</span> <span class="fu">as.Date</span>(<span class="fu">paste0</span>(<span class="fu">as.character</span>(end_year), <span class="st">"-"</span>, </span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>                              <span class="fu">sprintf</span>(<span class="st">"%02d"</span>, <span class="fu">as.integer</span>(end_month)), <span class="st">"-"</span>, </span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>                              <span class="fu">sprintf</span>(<span class="st">"%02d"</span>, <span class="fu">as.integer</span>(end_day))), </span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>                       <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>)</span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a><span class="co"># structure after conversion</span></span>
+<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(erup_date)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>tibble [11,178 × 17] (S3: tbl_df/tbl/data.frame)
+ $ volcano_number        : int [1:11178] 266030 343100 233020 345020 353010 273070 282050 241040 311060 284096 ...
+ $ volcano_name          : chr [1:11178] "Soputan" "San Miguel" "Fournaise, Piton de la" "Rincon de la Vieja" ...
+ $ eruption_number       : int [1:11178] 22354 22355 22343 22346 22347 22344 22345 22338 22341 22340 ...
+ $ eruption_category     : chr [1:11178] "Confirmed Eruption" "Confirmed Eruption" "Confirmed Eruption" "Confirmed Eruption" ...
+ $ area_of_activity      : chr [1:11178] NA NA NA NA ...
+ $ vei                   : int [1:11178] NA NA NA NA NA NA NA 2 NA 1 ...
+ $ start_year            : int [1:11178] 2020 2020 2020 2020 2020 2020 2020 2019 2019 2019 ...
+ $ start_month           : int [1:11178] 3 2 2 1 1 1 1 12 12 12 ...
+ $ start_day             : int [1:11178] 23 22 10 31 12 12 11 9 7 5 ...
+ $ evidence_method_dating: chr [1:11178] "Historical Observations" "Historical Observations" "Historical Observations" "Historical Observations" ...
+ $ end_year              : int [1:11178] 2020 2020 2020 2020 2020 2020 2020 2019 2020 2020 ...
+ $ end_month             : int [1:11178] 4 2 4 4 1 1 4 12 3 4 ...
+ $ end_day               : int [1:11178] 2 22 6 17 12 22 17 9 15 17 ...
+ $ latitude              : num [1:11178] 1.11 13.43 -21.24 10.83 -0.37 ...
+ $ longitude             : num [1:11178] 124.7 -88.3 55.7 -85.3 -91.5 ...
+ $ start_date            : Date[1:11178], format: "2020-03-23" "2020-02-22" ...
+ $ end_date              : Date[1:11178], format: "2020-04-02" "2020-02-22" ...</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># The first few rows to verify dates</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(erup_date)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 17
+  volcano_number volcano_name eruption_number eruption_category area_of_activity
+           &lt;int&gt; &lt;chr&gt;                  &lt;int&gt; &lt;chr&gt;             &lt;chr&gt;           
+1         266030 Soputan                22354 Confirmed Erupti… &lt;NA&gt;            
+2         343100 San Miguel             22355 Confirmed Erupti… &lt;NA&gt;            
+3         233020 Fournaise, …           22343 Confirmed Erupti… &lt;NA&gt;            
+4         345020 Rincon de l…           22346 Confirmed Erupti… &lt;NA&gt;            
+5         353010 Fernandina             22347 Confirmed Erupti… &lt;NA&gt;            
+6         273070 Taal                   22344 Confirmed Erupti… &lt;NA&gt;            
+# ℹ 12 more variables: vei &lt;int&gt;, start_year &lt;int&gt;, start_month &lt;int&gt;,
+#   start_day &lt;int&gt;, evidence_method_dating &lt;chr&gt;, end_year &lt;int&gt;,
+#   end_month &lt;int&gt;, end_day &lt;int&gt;, latitude &lt;dbl&gt;, longitude &lt;dbl&gt;,
+#   start_date &lt;date&gt;, end_date &lt;date&gt;</code></pre>
+</div>
+</div>
+<ol type="1">
+<li></li>
+</ol>
+</section>
+<section id="unite" class="level1">
+<h1>1.Unite ()</h1>
+<ol type="1">
+<li><p>will start by uniting the dates( start date, year, month and end date, month and year) Which it also makes the data longer</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co">#initial one</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>erup_unite <span class="ot">&lt;-</span> erup_date<span class="sc">%&gt;%</span></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">unite</span>(start_year, start_month, start_day, <span class="at">sep =</span> <span class="st">"_"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">unite</span>(end_year, end_month, end_day, <span class="at">sep =</span> <span class="st">"_"</span>)</span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(erup_unite)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>tibble [11,178 × 13] (S3: tbl_df/tbl/data.frame)
+ $ volcano_number        : int [1:11178] 266030 343100 233020 345020 353010 273070 282050 241040 311060 284096 ...
+ $ volcano_name          : chr [1:11178] "Soputan" "San Miguel" "Fournaise, Piton de la" "Rincon de la Vieja" ...
+ $ eruption_number       : int [1:11178] 22354 22355 22343 22346 22347 22344 22345 22338 22341 22340 ...
+ $ eruption_category     : chr [1:11178] "Confirmed Eruption" "Confirmed Eruption" "Confirmed Eruption" "Confirmed Eruption" ...
+ $ area_of_activity      : chr [1:11178] NA NA NA NA ...
+ $ vei                   : int [1:11178] NA NA NA NA NA NA NA 2 NA 1 ...
+ $ start_year            : chr [1:11178] "3_23" "2_22" "2_10" "1_31" ...
+ $ evidence_method_dating: chr [1:11178] "Historical Observations" "Historical Observations" "Historical Observations" "Historical Observations" ...
+ $ end_year              : chr [1:11178] "4_2" "2_22" "4_6" "4_17" ...
+ $ latitude              : num [1:11178] 1.11 13.43 -21.24 10.83 -0.37 ...
+ $ longitude             : num [1:11178] 124.7 -88.3 55.7 -85.3 -91.5 ...
+ $ start_date            : Date[1:11178], format: "2020-03-23" "2020-02-22" ...
+ $ end_date              : Date[1:11178], format: "2020-04-02" "2020-02-22" ...</code></pre>
+</div>
+</div>
+<h1 id="separate">2. Separate()</h1>
+<p>The second chunk am going to separate again (Separate year,month and date for both end and start) it makes the data wider.</p>
+<p>When separating the dates i encountered an error of format. I realized i have to introduce fill=right, reason some values were missing in the day section. this made the format to be an uniform. fill=“right” ensures to fill NA for the missing values</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyr)</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a><span class="co"># used mutate function to convert date to character as it had NA values</span></span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>erup_separate <span class="ot">&lt;-</span> erup_unite <span class="sc">%&gt;%</span></span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">start_date =</span> <span class="fu">as.character</span>(start_date),  </span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">end_date =</span> <span class="fu">as.character</span>(end_date)       </span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">separate</span>(start_date, <span class="at">into =</span> <span class="fu">c</span>(<span class="st">"start_year"</span>, <span class="st">"start_month"</span>, <span class="st">"start_day"</span>), <span class="at">sep =</span> <span class="st">"-"</span>, <span class="at">fill =</span> <span class="st">"right"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">separate</span>(end_date, <span class="at">into =</span> <span class="fu">c</span>(<span class="st">"end_year"</span>, <span class="st">"end_month"</span>, <span class="st">"end_day"</span>), <span class="at">sep =</span> <span class="st">"-"</span>, <span class="at">fill =</span> <span class="st">"right"</span>)</span>
+<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Recombine the components into Date format</span></span>
+<span id="cb31-14"><a href="#cb31-14" aria-hidden="true" tabindex="-1"></a><span class="co"># here i was just playing around with date format just to understand how NA values works in the date section</span></span>
+<span id="cb31-15"><a href="#cb31-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-16"><a href="#cb31-16" aria-hidden="true" tabindex="-1"></a>erup_final <span class="ot">&lt;-</span> erup_separate<span class="sc">%&gt;%</span></span>
+<span id="cb31-17"><a href="#cb31-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb31-18"><a href="#cb31-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">start_date =</span> <span class="fu">as.Date</span>(start_year, <span class="at">format =</span> <span class="st">"%Y"</span>),</span>
+<span id="cb31-19"><a href="#cb31-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">end_date =</span> <span class="fu">as.Date</span>(end_year, <span class="at">format =</span> <span class="st">"%Y"</span>)       </span>
+<span id="cb31-20"><a href="#cb31-20" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb31-21"><a href="#cb31-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-22"><a href="#cb31-22" aria-hidden="true" tabindex="-1"></a><span class="co"># he structure after conversion</span></span>
+<span id="cb31-23"><a href="#cb31-23" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(erup_final)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>tibble [11,178 × 17] (S3: tbl_df/tbl/data.frame)
+ $ volcano_number        : int [1:11178] 266030 343100 233020 345020 353010 273070 282050 241040 311060 284096 ...
+ $ volcano_name          : chr [1:11178] "Soputan" "San Miguel" "Fournaise, Piton de la" "Rincon de la Vieja" ...
+ $ eruption_number       : int [1:11178] 22354 22355 22343 22346 22347 22344 22345 22338 22341 22340 ...
+ $ eruption_category     : chr [1:11178] "Confirmed Eruption" "Confirmed Eruption" "Confirmed Eruption" "Confirmed Eruption" ...
+ $ area_of_activity      : chr [1:11178] NA NA NA NA ...
+ $ vei                   : int [1:11178] NA NA NA NA NA NA NA 2 NA 1 ...
+ $ evidence_method_dating: chr [1:11178] "Historical Observations" "Historical Observations" "Historical Observations" "Historical Observations" ...
+ $ latitude              : num [1:11178] 1.11 13.43 -21.24 10.83 -0.37 ...
+ $ longitude             : num [1:11178] 124.7 -88.3 55.7 -85.3 -91.5 ...
+ $ start_year            : chr [1:11178] "2020" "2020" "2020" "2020" ...
+ $ start_month           : chr [1:11178] "03" "02" "02" "01" ...
+ $ start_day             : chr [1:11178] "23" "22" "10" "31" ...
+ $ end_year              : chr [1:11178] "2020" "2020" "2020" "2020" ...
+ $ end_month             : chr [1:11178] "04" "02" "04" "04" ...
+ $ end_day               : chr [1:11178] "02" "22" "06" "17" ...
+ $ start_date            : Date[1:11178], format: "2020-01-31" "2020-01-31" ...
+ $ end_date              : Date[1:11178], format: "2020-01-31" "2020-01-31" ...</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co"># View the first few rows to verify the conversion</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(erup_final)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 17
+  volcano_number volcano_name eruption_number eruption_category area_of_activity
+           &lt;int&gt; &lt;chr&gt;                  &lt;int&gt; &lt;chr&gt;             &lt;chr&gt;           
+1         266030 Soputan                22354 Confirmed Erupti… &lt;NA&gt;            
+2         343100 San Miguel             22355 Confirmed Erupti… &lt;NA&gt;            
+3         233020 Fournaise, …           22343 Confirmed Erupti… &lt;NA&gt;            
+4         345020 Rincon de l…           22346 Confirmed Erupti… &lt;NA&gt;            
+5         353010 Fernandina             22347 Confirmed Erupti… &lt;NA&gt;            
+6         273070 Taal                   22344 Confirmed Erupti… &lt;NA&gt;            
+# ℹ 12 more variables: vei &lt;int&gt;, evidence_method_dating &lt;chr&gt;, latitude &lt;dbl&gt;,
+#   longitude &lt;dbl&gt;, start_year &lt;chr&gt;, start_month &lt;chr&gt;, start_day &lt;chr&gt;,
+#   end_year &lt;chr&gt;, end_month &lt;chr&gt;, end_day &lt;chr&gt;, start_date &lt;date&gt;,
+#   end_date &lt;date&gt;</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Example: Convert year, month, and day from Date to integers</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>erup_final <span class="ot">&lt;-</span> erup_final <span class="sc">%&gt;%</span></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">start_year_int =</span> <span class="fu">as.integer</span>(<span class="fu">year</span>(start_date)),  <span class="co"># Extract and convert year to integer</span></span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">start_month_int =</span> <span class="fu">as.integer</span>(<span class="fu">month</span>(start_date)), <span class="co"># Extract and convert month to integer</span></span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">start_day_int =</span> <span class="fu">as.integer</span>(<span class="fu">day</span>(start_date)),     <span class="co"># Extract and convert day to integer</span></span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">end_year_int =</span> <span class="fu">as.integer</span>(<span class="fu">year</span>(end_date)),       <span class="co"># Extract and convert year to integer</span></span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">end_month_int =</span> <span class="fu">as.integer</span>(<span class="fu">month</span>(end_date)),     <span class="co"># Extract and convert month to integer</span></span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">end_day_int =</span> <span class="fu">as.integer</span>(<span class="fu">day</span>(end_date))          <span class="co"># Extract and convert day to integer</span></span>
+<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-13"><a href="#cb35-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Check the structure of the resulting dataframe</span></span>
+<span id="cb35-14"><a href="#cb35-14" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(erup_final)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>tibble [11,178 × 23] (S3: tbl_df/tbl/data.frame)
+ $ volcano_number        : int [1:11178] 266030 343100 233020 345020 353010 273070 282050 241040 311060 284096 ...
+ $ volcano_name          : chr [1:11178] "Soputan" "San Miguel" "Fournaise, Piton de la" "Rincon de la Vieja" ...
+ $ eruption_number       : int [1:11178] 22354 22355 22343 22346 22347 22344 22345 22338 22341 22340 ...
+ $ eruption_category     : chr [1:11178] "Confirmed Eruption" "Confirmed Eruption" "Confirmed Eruption" "Confirmed Eruption" ...
+ $ area_of_activity      : chr [1:11178] NA NA NA NA ...
+ $ vei                   : int [1:11178] NA NA NA NA NA NA NA 2 NA 1 ...
+ $ evidence_method_dating: chr [1:11178] "Historical Observations" "Historical Observations" "Historical Observations" "Historical Observations" ...
+ $ latitude              : num [1:11178] 1.11 13.43 -21.24 10.83 -0.37 ...
+ $ longitude             : num [1:11178] 124.7 -88.3 55.7 -85.3 -91.5 ...
+ $ start_year            : chr [1:11178] "2020" "2020" "2020" "2020" ...
+ $ start_month           : chr [1:11178] "03" "02" "02" "01" ...
+ $ start_day             : chr [1:11178] "23" "22" "10" "31" ...
+ $ end_year              : chr [1:11178] "2020" "2020" "2020" "2020" ...
+ $ end_month             : chr [1:11178] "04" "02" "04" "04" ...
+ $ end_day               : chr [1:11178] "02" "22" "06" "17" ...
+ $ start_date            : Date[1:11178], format: "2020-01-31" "2020-01-31" ...
+ $ end_date              : Date[1:11178], format: "2020-01-31" "2020-01-31" ...
+ $ start_year_int        : int [1:11178] 2020 2020 2020 2020 2020 2020 2020 2019 2019 2019 ...
+ $ start_month_int       : int [1:11178] 1 1 1 1 1 1 1 1 1 1 ...
+ $ start_day_int         : int [1:11178] 31 31 31 31 31 31 31 31 31 31 ...
+ $ end_year_int          : int [1:11178] 2020 2020 2020 2020 2020 2020 2020 2019 2020 2020 ...
+ $ end_month_int         : int [1:11178] 1 1 1 1 1 1 1 1 1 1 ...
+ $ end_day_int           : int [1:11178] 31 31 31 31 31 31 31 31 31 31 ...</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co"># View the first few rows to verify the conversion</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(erup_final)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 23
+  volcano_number volcano_name eruption_number eruption_category area_of_activity
+           &lt;int&gt; &lt;chr&gt;                  &lt;int&gt; &lt;chr&gt;             &lt;chr&gt;           
+1         266030 Soputan                22354 Confirmed Erupti… &lt;NA&gt;            
+2         343100 San Miguel             22355 Confirmed Erupti… &lt;NA&gt;            
+3         233020 Fournaise, …           22343 Confirmed Erupti… &lt;NA&gt;            
+4         345020 Rincon de l…           22346 Confirmed Erupti… &lt;NA&gt;            
+5         353010 Fernandina             22347 Confirmed Erupti… &lt;NA&gt;            
+6         273070 Taal                   22344 Confirmed Erupti… &lt;NA&gt;            
+# ℹ 18 more variables: vei &lt;int&gt;, evidence_method_dating &lt;chr&gt;, latitude &lt;dbl&gt;,
+#   longitude &lt;dbl&gt;, start_year &lt;chr&gt;, start_month &lt;chr&gt;, start_day &lt;chr&gt;,
+#   end_year &lt;chr&gt;, end_month &lt;chr&gt;, end_day &lt;chr&gt;, start_date &lt;date&gt;,
+#   end_date &lt;date&gt;, start_year_int &lt;int&gt;, start_month_int &lt;int&gt;,
+#   start_day_int &lt;int&gt;, end_year_int &lt;int&gt;, end_month_int &lt;int&gt;,
+#   end_day_int &lt;int&gt;</code></pre>
+</div>
+</div></li>
+</ol>
+<p>I also used lubridate library to convert years,month date to interger</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lubridate)<span class="co"># for date mutation</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Mutate to convert dates to character as it had NA values</span></span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>erup_separate <span class="ot">&lt;-</span> erup_unite <span class="sc">%&gt;%</span></span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">start_date =</span> <span class="fu">as.character</span>(start_date),  </span>
+<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">end_date =</span> <span class="fu">as.character</span>(end_date)       </span>
+<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb39-9"><a href="#cb39-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">separate</span>(start_date, <span class="at">into =</span> <span class="fu">c</span>(<span class="st">"start_year"</span>, <span class="st">"start_month"</span>, <span class="st">"start_day"</span>), <span class="at">sep =</span> <span class="st">"-"</span>, <span class="at">fill =</span> <span class="st">"right"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb39-10"><a href="#cb39-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">separate</span>(end_date, <span class="at">into =</span> <span class="fu">c</span>(<span class="st">"end_year"</span>, <span class="st">"end_month"</span>, <span class="st">"end_day"</span>), <span class="at">sep =</span> <span class="st">"-"</span>, <span class="at">fill =</span> <span class="st">"right"</span>)</span>
+<span id="cb39-11"><a href="#cb39-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-12"><a href="#cb39-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Recombine the components into full Date format</span></span>
+<span id="cb39-13"><a href="#cb39-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Here i was just trying different codes to get better understanding of NA in date data.</span></span>
+<span id="cb39-14"><a href="#cb39-14" aria-hidden="true" tabindex="-1"></a><span class="co"># here i used an assumtion all my date rows are in the same format</span></span>
+<span id="cb39-15"><a href="#cb39-15" aria-hidden="true" tabindex="-1"></a>erup_final <span class="ot">&lt;-</span> erup_separate <span class="sc">%&gt;%</span></span>
+<span id="cb39-16"><a href="#cb39-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb39-17"><a href="#cb39-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">start_date =</span> <span class="fu">as.Date</span>(<span class="fu">paste</span>(start_year, <span class="st">"01"</span>, <span class="st">"01"</span>, <span class="at">sep =</span> <span class="st">"-"</span>), <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>),  </span>
+<span id="cb39-18"><a href="#cb39-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">end_date =</span> <span class="fu">as.Date</span>(<span class="fu">paste</span>(end_year, <span class="st">"01"</span>, <span class="st">"01"</span>, <span class="at">sep =</span> <span class="st">"-"</span>), <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>)       </span>
+<span id="cb39-19"><a href="#cb39-19" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="co"># I then extracted year, month, and date as intergers using mutate function</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>erup_final2 <span class="ot">&lt;-</span> erup_final <span class="sc">%&gt;%</span></span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">start_year_int =</span> <span class="fu">as.integer</span>(<span class="fu">year</span>(start_date)),  </span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">start_month_int =</span> <span class="fu">as.integer</span>(<span class="fu">month</span>(start_date)), </span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">start_day_int =</span> <span class="fu">as.integer</span>(<span class="fu">day</span>(start_date)),     </span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">end_year_int =</span> <span class="fu">as.integer</span>(<span class="fu">year</span>(end_date)),       </span>
+<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">end_month_int =</span> <span class="fu">as.integer</span>(<span class="fu">month</span>(end_date)),     </span>
+<span id="cb40-10"><a href="#cb40-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">end_day_int =</span> <span class="fu">as.integer</span>(<span class="fu">day</span>(end_date)) </span>
+<span id="cb40-11"><a href="#cb40-11" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb40-12"><a href="#cb40-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-13"><a href="#cb40-13" aria-hidden="true" tabindex="-1"></a><span class="co">#  structure after conversion</span></span>
+<span id="cb40-14"><a href="#cb40-14" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(erup_final2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>tibble [11,178 × 23] (S3: tbl_df/tbl/data.frame)
+ $ volcano_number        : int [1:11178] 266030 343100 233020 345020 353010 273070 282050 241040 311060 284096 ...
+ $ volcano_name          : chr [1:11178] "Soputan" "San Miguel" "Fournaise, Piton de la" "Rincon de la Vieja" ...
+ $ eruption_number       : int [1:11178] 22354 22355 22343 22346 22347 22344 22345 22338 22341 22340 ...
+ $ eruption_category     : chr [1:11178] "Confirmed Eruption" "Confirmed Eruption" "Confirmed Eruption" "Confirmed Eruption" ...
+ $ area_of_activity      : chr [1:11178] NA NA NA NA ...
+ $ vei                   : int [1:11178] NA NA NA NA NA NA NA 2 NA 1 ...
+ $ evidence_method_dating: chr [1:11178] "Historical Observations" "Historical Observations" "Historical Observations" "Historical Observations" ...
+ $ latitude              : num [1:11178] 1.11 13.43 -21.24 10.83 -0.37 ...
+ $ longitude             : num [1:11178] 124.7 -88.3 55.7 -85.3 -91.5 ...
+ $ start_year            : chr [1:11178] "2020" "2020" "2020" "2020" ...
+ $ start_month           : chr [1:11178] "03" "02" "02" "01" ...
+ $ start_day             : chr [1:11178] "23" "22" "10" "31" ...
+ $ end_year              : chr [1:11178] "2020" "2020" "2020" "2020" ...
+ $ end_month             : chr [1:11178] "04" "02" "04" "04" ...
+ $ end_day               : chr [1:11178] "02" "22" "06" "17" ...
+ $ start_date            : Date[1:11178], format: "2020-01-01" "2020-01-01" ...
+ $ end_date              : Date[1:11178], format: "2020-01-01" "2020-01-01" ...
+ $ start_year_int        : int [1:11178] 2020 2020 2020 2020 2020 2020 2020 2019 2019 2019 ...
+ $ start_month_int       : int [1:11178] 1 1 1 1 1 1 1 1 1 1 ...
+ $ start_day_int         : int [1:11178] 1 1 1 1 1 1 1 1 1 1 ...
+ $ end_year_int          : int [1:11178] 2020 2020 2020 2020 2020 2020 2020 2019 2020 2020 ...
+ $ end_month_int         : int [1:11178] 1 1 1 1 1 1 1 1 1 1 ...
+ $ end_day_int           : int [1:11178] 1 1 1 1 1 1 1 1 1 1 ...</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="co"># The first few rows to verify the conversion</span></span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(erup_final2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 23
+  volcano_number volcano_name eruption_number eruption_category area_of_activity
+           &lt;int&gt; &lt;chr&gt;                  &lt;int&gt; &lt;chr&gt;             &lt;chr&gt;           
+1         266030 Soputan                22354 Confirmed Erupti… &lt;NA&gt;            
+2         343100 San Miguel             22355 Confirmed Erupti… &lt;NA&gt;            
+3         233020 Fournaise, …           22343 Confirmed Erupti… &lt;NA&gt;            
+4         345020 Rincon de l…           22346 Confirmed Erupti… &lt;NA&gt;            
+5         353010 Fernandina             22347 Confirmed Erupti… &lt;NA&gt;            
+6         273070 Taal                   22344 Confirmed Erupti… &lt;NA&gt;            
+# ℹ 18 more variables: vei &lt;int&gt;, evidence_method_dating &lt;chr&gt;, latitude &lt;dbl&gt;,
+#   longitude &lt;dbl&gt;, start_year &lt;chr&gt;, start_month &lt;chr&gt;, start_day &lt;chr&gt;,
+#   end_year &lt;chr&gt;, end_month &lt;chr&gt;, end_day &lt;chr&gt;, start_date &lt;date&gt;,
+#   end_date &lt;date&gt;, start_year_int &lt;int&gt;, start_month_int &lt;int&gt;,
+#   start_day_int &lt;int&gt;, end_year_int &lt;int&gt;, end_month_int &lt;int&gt;,
+#   end_day_int &lt;int&gt;</code></pre>
+</div>
+</div>
+<p>I will use select () function to select; end and start year, eruption category ,evidence method dating and volcanic name.</p>
+<p>At these level i realised something is wrong with my dates they got distorted. I had to work backwards to sort it out to maintain the original format.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>erup_select<span class="ot">&lt;-</span> erup_final2 <span class="sc">%&gt;%</span> <span class="fu">select</span>(volcano_name,eruption_category,evidence_method_dating,start_year,end_year)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="co"># I tried to run pivote wide but realised an error of duplicate</span></span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a><span class="co"># To understand what these duplicates are i used function summarise and filter. I found out it is not duplicate rather it's frequency of occurence.</span></span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>erup_select <span class="sc">%&gt;%</span></span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">summarise</span>(<span class="at">n =</span> dplyr<span class="sc">::</span><span class="fu">n</span>(), <span class="at">.by =</span> <span class="fu">c</span>(volcano_name, evidence_method_dating, eruption_category)) <span class="sc">%&gt;%</span></span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(n <span class="sc">&gt;</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1,151 × 4
+   volcano_name           evidence_method_dating  eruption_category      n
+   &lt;chr&gt;                  &lt;chr&gt;                   &lt;chr&gt;              &lt;int&gt;
+ 1 Soputan                Historical Observations Confirmed Eruption    41
+ 2 San Miguel             Historical Observations Confirmed Eruption    40
+ 3 Fournaise, Piton de la Historical Observations Confirmed Eruption   178
+ 4 Rincon de la Vieja     Historical Observations Confirmed Eruption    25
+ 5 Fernandina             Historical Observations Confirmed Eruption    28
+ 6 Taal                   Historical Observations Confirmed Eruption    34
+ 7 Kuchinoerabujima       Historical Observations Confirmed Eruption    17
+ 8 Whakaari/White Island  Historical Observations Confirmed Eruption    36
+ 9 Semisopochnoi          Historical Observations Confirmed Eruption     5
+10 Nishinoshima           Historical Observations Confirmed Eruption     5
+# ℹ 1,141 more rows</code></pre>
+</div>
+</div>
+<hr>
+</section>
+<section id="group_by-summarise-frequency" class="level1">
+<h1>3.Group_by (), Summarise (), frequency</h1>
+<p>This motivated me to run group by function to summarise frequency of eruption category</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>erup_group <span class="ot">&lt;-</span> erup_select <span class="sc">%&gt;%</span></span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(volcano_name, evidence_method_dating, eruption_category) <span class="sc">%&gt;%</span></span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">frequency =</span> <span class="fu">n</span>(),  <span class="co"># Count occurrences of each eruption_category</span></span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span>  <span class="co"># I used this function to ungroup after summarizing to avoid frequency being run with valcanic names</span></span>
+<span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<hr>
+</section>
+<section id="data-visualization-using-advanced-ggplot2" class="level1">
+<h1>Data visualization using Advanced ggplot2</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="co"># additional libraries for advanced ggplot2</span></span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(palmerpenguins)</span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(patchwork) <span class="co"># plot alignment</span></span>
+<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(plotly) </span>
+<span id="cb48-6"><a href="#cb48-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggiraph)</span>
+<span id="cb48-7"><a href="#cb48-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggrepel)</span>
+<span id="cb48-8"><a href="#cb48-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-9"><a href="#cb48-9" aria-hidden="true" tabindex="-1"></a><span class="co"># plot 1: Relationship between eruption_category and frequency across volcanoes.</span></span>
+<span id="cb48-10"><a href="#cb48-10" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb48-11"><a href="#cb48-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-12"><a href="#cb48-12" aria-hidden="true" tabindex="-1"></a>ecfv<span class="ot">&lt;-</span><span class="fu">ggplot</span>(erup_group, <span class="fu">aes</span>(<span class="at">x =</span> eruption_category, <span class="at">y =</span> frequency, <span class="at">color =</span> evidence_method_dating)) <span class="sc">+</span></span>
+<span id="cb48-13"><a href="#cb48-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">3</span>, <span class="at">alpha =</span> <span class="fl">0.7</span>) <span class="sc">+</span>  <span class="co"># Scatter plot</span></span>
+<span id="cb48-14"><a href="#cb48-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"loess"</span>, <span class="at">se =</span> <span class="cn">TRUE</span>) <span class="sc">+</span>  <span class="co"># Smoothed trend line</span></span>
+<span id="cb48-15"><a href="#cb48-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Eruption Frequency by Category"</span>,</span>
+<span id="cb48-16"><a href="#cb48-16" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Eruption Category"</span>,</span>
+<span id="cb48-17"><a href="#cb48-17" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Frequency"</span>,</span>
+<span id="cb48-18"><a href="#cb48-18" aria-hidden="true" tabindex="-1"></a>       <span class="at">color =</span> <span class="st">"Dating Method"</span>) <span class="sc">+</span></span>
+<span id="cb48-19"><a href="#cb48-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="plot2eruption-frequency-trends-over-time." class="level1">
+<h1>plot2;Eruption frequency trends over time.</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>eftot<span class="ot">&lt;-</span><span class="fu">ggplot</span>(erup_group, <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">as.integer</span>(start_year), <span class="at">y =</span> frequency, <span class="at">color =</span> eruption_category)) <span class="sc">+</span></span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">3</span>, <span class="at">alpha =</span> <span class="fl">0.7</span>) <span class="sc">+</span></span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">se =</span> <span class="cn">FALSE</span>) <span class="sc">+</span>  <span class="co"># Linear regression trend</span></span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Eruption Frequency Over Time"</span>,</span>
+<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Start Year"</span>,</span>
+<span id="cb49-6"><a href="#cb49-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Frequency"</span>,</span>
+<span id="cb49-7"><a href="#cb49-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">color =</span> <span class="st">"Eruption Category"</span>) <span class="sc">+</span></span>
+<span id="cb49-8"><a href="#cb49-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 </section>
 
 </main>
